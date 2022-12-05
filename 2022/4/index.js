@@ -36,7 +36,7 @@ const entireAssignmentOverlaps = mappedInput.filter((sections) => {
 
 console.log(entireAssignmentOverlaps.length);
 
-// part 1
+// part 2
 const assignmentOverlaps = mappedInput
     .map((sections) => {
         const set = new Set(sections[0]);

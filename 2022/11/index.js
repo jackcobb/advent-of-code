@@ -37,12 +37,15 @@ for (let i = 0; i < numberMonkeys; i++) {
         return score % ${testDenominator} === 0 ? ${trueMonkey} : ${falseMonkey};
     `);
     monkey.test = testFunction;
+    monkey.divisor = testDenominator;
 
     monkeyMap.push(monkey);
 }
 
 
-const processRounds = (rounds = 0, worryLevel = 0, worryFuntion = () => { }) => {
+const processRounds = (rounds = 0, worryLevel = 0, worryFunction = (monkey, score, divisor) => {
+    return Math.floor(score / divisor);
+}) => {
     for (let round = 0; round < rounds; round++) {
         for (let i = 0; i < monkeyMap.length; i++) {
             const monkey = monkeyMap[i];
@@ -51,7 +54,7 @@ const processRounds = (rounds = 0, worryLevel = 0, worryFuntion = () => { }) => 
                 monkey.history.push(item);
 
                 const operationScore = monkey.operation(item);
-                const worryLevelScore = worryFuntion(operationScore, worryLevel); Math.floor(operationScore / worryLevel);
+                const worryLevelScore = worryFunction(monkey, operationScore, worryLevel);
                 const throwToMonkey = monkey.test(worryLevelScore);
                 monkeyMap[throwToMonkey].items.push(worryLevelScore);
             });
@@ -64,9 +67,7 @@ const processRounds = (rounds = 0, worryLevel = 0, worryFuntion = () => { }) => 
 
 
 // part 1
-processRounds(20, 3, (score, worryLevel) => {
-    return Math.floor(score / worryLevel)
-});
+processRounds(20, 3);
 
 console.log(monkeyMap.map(monkey => monkey.history.length).sort((a, b) => a - b).reverse().splice(0, 2).reduce((prev, curr) => prev * curr));
 
@@ -76,3 +77,11 @@ monkeyMap.forEach(monkey => {
     monkey.history = [];
     monkey.items = [...monkey.startingItems];
 });
+
+const divisor = monkeyMap.reduce((previousValue, monkey) => previousValue * monkey.divisor, 1);
+
+processRounds(10000, 3, (monkey, score) => {
+    return Math.floor(score % divisor);
+});
+
+console.log(monkeyMap.map(monkey => monkey.history.length).sort((a, b) => a - b).reverse().splice(0, 2).reduce((prev, curr) => prev * curr));
